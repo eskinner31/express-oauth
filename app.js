@@ -1,11 +1,11 @@
 require('dotenv').load();
-var cookieSession = require('cookie-session');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 var passport = require('passport');
 var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 
@@ -25,11 +25,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cookieSession)({
-  name:'session',
-  keys:[process.env.SECRET_ONE,process.env.SECRET_TWO]
-})
-app.use(express.session({ secret: process.env.SECRET }));
+app.use(session({
+  genid: function(req) {
+    return genuuid() // use UUIDs for session IDs
+  },
+  secret: process.env.SECRET_ONE
+}))
 app.use(passport.initialize());
 passport.use(new LinkedInStrategy({
   clientID: process.env.LINKEDIN_CLIENT_ID,

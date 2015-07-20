@@ -21,7 +21,7 @@ passport.use(new LinkedInStrategy({
   scope: ['r_emailaddress', 'r_basicprofile'],
   state: true
 }, function(accessToken, refreshToken, profile, done) {
-  done(null, {id: profile.id, displayName: profile.displayName})
+  done(null, {id: profile.id, displayName: profile.displayName, token: accessToken})
 }));
 
 app.set('trust proxy', 1) // trust first proxy
@@ -33,7 +33,7 @@ app.set('view engine', 'hbs');
 
 app.use(cookieSession({
   name: 'session',
-  keys: [ 'key1', 'key2']
+  keys: [ process.env.SECRET_ONE, process.env.SECRET_TWO]
 }));
 //process.env.SECRET_ONE
 // uncomment after placing your favicon in /public
@@ -71,7 +71,6 @@ passport.deserializeUser(function(user, done) {
 
 // right above app.use('/', routes);
 app.use(function (req, res, next) {
-  console.log(req.user, 'XXX');
   res.locals.user = req.user
   next()
 })
